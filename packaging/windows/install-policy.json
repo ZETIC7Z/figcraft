@@ -1,4 +1,4 @@
-{
+﻿{
   "id": "figcraft",
   "name": "FigCraft",
   "upgradeCode": "7F8B9827-D065-41B7-A514-2A454B21F484",
@@ -124,3 +124,4 @@
   ],
   "mode": "dualScope"
 }
+

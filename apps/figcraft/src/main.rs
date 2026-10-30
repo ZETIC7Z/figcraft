@@ -1,11 +1,11 @@
-//! FigCraft desktop app.
+﻿//! FigCraft desktop app.
 //!
-//! Usage: `figcraft [--control <port>] [files…] [figcraft://join?…]` (an invite link joins that
+//! Usage: `figcraft [--control <port>] [filesâ€¦] [figcraft://join?â€¦]` (an invite link joins that
 //! live session; the app registers itself as the opener of such links: `collab.registerLinks`).
 //!
 //! `--control <port>` (or `FIGCRAFT_CONTROL_PORT`) starts a localhost JSON-lines control server:
 //! `{"id":1,"method":"engine.execute","params":{"command":"shape.rectangle","params":{"x":0,"y":0,"width":100,"height":100}}}`
-//! → `{"id":1,"ok":true,"result":{…}}`. Methods: `figcraft_ui_egui::control`.
+//! â†’ `{"id":1,"ok":true,"result":{â€¦}}`. Methods: `figcraft_ui_egui::control`.
 //!
 //! `--automation-read-root <dir>` / `--automation-write-root <dir>` (each repeatable) confine the
 //! files the window and the control channel read and write (`figcraft_engine::file_access`); the
@@ -242,7 +242,7 @@ fn main() -> eframe::Result {
     // The app id is the Wayland app_id and the X11 window class on Linux: the desktop entry's name
     // and StartupWMClass (FreeBSD's package matches the binary's name instead).
     let mut viewport = egui::ViewportBuilder::default()
-        .with_title("FigCraft")
+        .with_title("Zetica Fig")
         .with_app_id("ai.storyteller.figcraft")
         .with_inner_size([1440.0, 900.0])
         .with_min_inner_size([800.0, 500.0])
@@ -251,8 +251,8 @@ fn main() -> eframe::Result {
     // craft-window crate (the rest of the Craft suite uses it too). On macOS the system frame is
     // kept with FigCraft's inset traffic lights; on Windows it is the system frame; on Linux the
     // decision follows the desktop: a Wayland compositor with server-side decorations (KDE, Sway,
-    // Hyprland, COSMIC) or an X11 window manager keeps the native frame, while GNOME's Mutter —
-    // which draws no server-side frame — leaves it to the app's own custom title bar. This replaces
+    // Hyprland, COSMIC) or an X11 window manager keeps the native frame, while GNOME's Mutter â€”
+    // which draws no server-side frame â€” leaves it to the app's own custom title bar. This replaces
     // the old bespoke xdg-decoration probe that always drew FigCraft's custom title bar on KDE.
     fig.ui.title_bar = desktop_title_bar();
     viewport = window_chrome(viewport, fig.ui.title_bar);
@@ -270,19 +270,18 @@ fn main() -> eframe::Result {
     let apple_events = apple_events::AppleEvents::install();
     #[cfg(target_os = "macos")]
     let apple_events = &apple_events;
-    let result = eframe::run_native(
-        "FigCraft",
+    let result = eframe::run_native("Zetica Fig",
         options,
         Box::new(|cc| {
             if let Some(state) = &cc.wgpu_render_state {
                 graphics.opened(&state.adapter.get_info());
             }
             with_app(|fig| fig.services.set_egui_context(&cc.egui_ctx));
-            // winit's own Quit (⌘Q) ends the process through `terminate:` without ever asking the
+            // winit's own Quit (âŒ˜Q) ends the process through `terminate:` without ever asking the
             // app, so unsaved changes are lost with no warning (issue #857). This menu's Quit
             // sends the root window a close request instead, and the unsaved-changes question
             // asks just as it does for the close button. Failure keeps winit's menu: the app
-            // runs, but ⌘Q ends it without asking.
+            // runs, but âŒ˜Q ends it without asking.
             #[cfg(target_os = "macos")]
             if let Err(e) = craft_menu::mac::install_app_menu(&cc.egui_ctx, "FigCraft") {
                 log::warn!("app menu: kept winit's Quit, which ends the app without asking: {e}");
@@ -323,10 +322,10 @@ fn desktop_title_bar() -> figcraft_ui_egui::TitleBar {
 
 /// Map craft-window's [`craft_window::Frame`] onto FigCraft's own [`figcraft_ui_egui::TitleBar`].
 ///
-/// `Frame::App` means the app draws its own frame — FigCraft's custom title bar. `Frame::Desktop`
+/// `Frame::App` means the app draws its own frame â€” FigCraft's custom title bar. `Frame::Desktop`
 /// means the desktop draws it, but FigCraft keeps each platform's existing look there:
 /// - macOS: the inset title bar with its traffic lights (`TitleBar::Inset`), unchanged.
-/// - Windows: FigCraft's own custom title bar (`TitleBar::Custom`), unchanged — Windows never used
+/// - Windows: FigCraft's own custom title bar (`TitleBar::Custom`), unchanged â€” Windows never used
 ///   the plain native frame, and craft-window returning `Desktop` on Windows must not change that.
 /// - Linux and the BSDs: the compositor's native frame (`TitleBar::Native`). This is the only
 ///   behaviour change: KDE and the other server-side-decoration compositors now keep their frame.
@@ -414,3 +413,4 @@ mod start_tests {
         assert!(!opens_new_file(true, false, false), "a first run shows the home screen");
     }
 }
+
