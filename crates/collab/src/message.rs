@@ -617,6 +617,18 @@ pub struct Usage {
     pub components: Vec<(NodeId, u32)>,
 }
 
+/// Most styles and most variables of one library one file reports using.
+pub const MAX_ASSET_USAGE: usize = 250;
+
+/// How many layers of one file use each of a library's styles and variables, as its app reports
+/// them: the file's name and the counts (by their ids in the library).
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+pub struct AssetUsage {
+    pub file: String,
+    pub styles: Vec<(String, u32)>,
+    pub variables: Vec<(String, u32)>,
+}
+
 /// A file's last usage report, with when it came (seconds since 1970, UTC).
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct FileUsage {
@@ -639,6 +651,17 @@ pub struct FileDetached {
     pub updated: u64,
 }
 
+/// What happened to one library component in one week (the week starting `week`, seconds since
+/// 1970 UTC, a Monday at 00:00), over every file that reported it: instances inserted (placed,
+/// pasted or duplicated) and detached, counted when the server first heard of them.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub struct WeekActions {
+    pub week: u64,
+    pub component: NodeId,
+    pub insertions: u32,
+    pub detachments: u32,
+}
+
 /// A request on a library connection; each gets one [`LibraryReply`], in order.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -658,6 +681,17 @@ pub enum LibraryReq {
     ReportDetached(Detached),
     /// The detach reports of the files that use the library.
     Detached,
+    /// How many instances of each library component the asking file has inserted (a
+    /// [`Detached`]-shaped report of its totals; answered with [`LibraryReply::Noted`]).
+    ReportInserted(Detached),
+    /// The library's components' insertions and detachments week by week (answered with
+    /// [`LibraryReply::Actions`]).
+    Actions,
+    /// How many layers of the asking file use the library's styles and variables (answered with
+    /// [`LibraryReply::Noted`]).
+    ReportAssets(AssetUsage),
+    /// The style and variable reports of the files that use the library.
+    Assets,
 }
 
 /// The answer to a [`LibraryReq`] (the first one on a connection answers [`OpenLibrary`]).
@@ -691,6 +725,8 @@ pub enum LibraryReply {
     /// A report was kept.
     Noted,
     Detached(Vec<FileDetached>),
+    Actions(Vec<WeekActions>),
+    Assets(Vec<AssetUsage>),
 }
 
 /// Opens a connection to a server's plugin directory (instead of [`Hello`]). Anyone who can reach
